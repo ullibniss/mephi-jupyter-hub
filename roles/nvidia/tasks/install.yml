@@ -1,0 +1,54 @@
+---
+- name: Create nvidia deploy dir
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  loop:
+    - "{{ nvidia_deploy_dir}}"
+  become: true
+
+- name: Download nvidia gpg repo key
+  ansible.builtin.uri:
+    url: https://nvidia.github.io/nvidia-container-runtime/gpgkey
+    dest: "{{ nvidia_deploy_dir }}/nvidia_gpgkey"
+    group: "{{ default_user }}"
+    owner: "{{ default_user }}" 
+    mode: 0644
+  become: true
+  ignore_errors: true
+
+- name: Add apt key for repo
+  ansible.builtin.apt_key:
+    file: "{{ nvidia_deploy_dir }}/nvidia_gpgkey"
+  become: true
+
+- name: Set distibution variable
+  ansible.builtin.shell: . /etc/os-release;echo $ID$VERSION_ID
+  register: distibution
+
+- name: Debug
+  ansible.builtin.debug:
+    msg: "{{ distibution }}"
+
+- name: Download nvidia source list
+  ansible.builtin.uri:
+    url: "https://nvidia.github.io/nvidia-container-runtime/{{ distibution.stdout }}/nvidia-container-runtime.list"
+    dest: /etc/apt/sources.list.d/nvidia-container-runtime.list
+    group: 0
+    owner: 0
+    mode: 0644
+  become: true
+  ignore_errors: true
+  
+- name: Apt update
+  ansible.builtin.apt:
+    update_cache: true
+  become: true
+
+- name: Install nvidia-container-runtime
+  ansible.builtin.apt:
+    pkg: "nvidia-container-runtime"
+  become: true

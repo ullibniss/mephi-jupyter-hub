@@ -1,0 +1,2 @@
+---
+- include_tasks: "{{ nvidia_action }}.yml"
