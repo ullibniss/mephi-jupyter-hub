@@ -1,0 +1,5 @@
+---
+- name: Build docker image
+  ansible.builtin.command: docker build . -t "{{ docker_image_name }}:{{ docker image tag }}"
+  args:
+    chdir: "{{ docker_build_dir }}"
