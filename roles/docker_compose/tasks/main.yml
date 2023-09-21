@@ -1,0 +1,2 @@
+---
+- include_tasks: "{{ docker_compose_action }}.yml"

@@ -1,0 +1,5 @@
+---
+- name: Get logs for {{ docker_compose_deploy_dir }}
+  command: docker-compose logs
+  args:
+    chdir: "{{ docker_compose_service_deploy_dir }}"

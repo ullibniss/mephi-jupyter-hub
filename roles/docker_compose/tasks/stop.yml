@@ -1,0 +1,5 @@
+---
+- name: Stop docker-compose application
+  command: 'docker-compose stop'
+  args:
+    chdir: "{{ docker_compose_service_deploy_dir }}"

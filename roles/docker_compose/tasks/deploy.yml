@@ -1,0 +1,10 @@
+---
+- name: Render docker-compose file
+  template:
+    src: "{{ docker_compose_template }}"
+    dest: "{{ docker_compose_service_deploy_dir }}"
+
+- name: Pull docker-compose image
+  command: docker-compose pull
+  args:
+    chdir: "{{ docker_compose_service_deploy_dir }}"

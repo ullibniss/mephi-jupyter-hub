@@ -1,0 +1,5 @@
+---
+- name: Get status for "{{ docker_compose_deploy_dir }}"
+  command: docker-compose ps
+  args:
+    chdir: "{{ docker_compose_service_deploy_dir }}"

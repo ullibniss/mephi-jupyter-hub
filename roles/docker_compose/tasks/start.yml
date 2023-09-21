@@ -1,0 +1,5 @@
+---
+- name: Start docker-compose application
+  command: 'docker-compose up -d {{ "--force-recreate" if docker_compose_force_recreate is defined and docker_compose_force_recreate == true else "" }}'
+  args:
+    chdir: "{{ docker_compose_service_deploy_dir }}"
