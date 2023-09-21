@@ -1,0 +1,11 @@
+deploy_dir: "/home/{{ default_user }}/deployment"
+default_user: "{{ lookup('env', 'USER') }}"
+
+vault_deploy_dir: "{{ deploy_dir }}/vault"
+vault_version: "1.13.2"
+vault_root_token: "91940BsqMs!HQ#9DjfUkf"
+vault_internal_host: vault
+vault_host: vault.localhost
+vault_port: "8200"
+vault_enable_https: true
+vault_unsealer: true

@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  vault:
+    image: vault:{{ vault_version }}
+    container_name: vault
+    hostname: vault
+    ports:
+      - "127.0.0.1:{{ vault_port }}:{{ vault_port }}"
+    volumes:
+      - ./vault-config.hcl:/vault/config/config.hcl
+      - vault-data:/vault/file/
+    cap_add:
+      - IPC_LOCK
+    command: server
+    restart: always
+    healthcheck:
+      test: wget --no-verbose --tries=1 --spider http://localhost:{{ vault_port }}/ui/ || exit 1
+      interval: 10s
+      retries: 12
+      timeout: 10s
+    networks:
+      - dockernet
+
+{% if vault_unsealer %}
+  vault-init:
+    image: vault:{{vault_version}}
+    container_name: vault-init
+    environment:
+      - VAULT_ADDR=http://vault:{{ vault_port }}
+      - MY_VAULT_TOKEN={{ vault_root_token }}
+    volumes:
+      - ./vault-root-token:/vault/file/vault-root-token
+      - ./vault-init.sh:/usr/local/bin/vault-init.sh
+      - vault-data:/vault/file/
+    entrypoint: /usr/local/bin/vault-init.sh
+    restart: always
+    depends_on:
+      vault:
+        condition: service_healthy
+    networks:
+      - dockernet
+{% endif %}
+
+volumes:
+  vault-data: {}
+
+networks:
+  dockernet:
+    external: true

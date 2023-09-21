@@ -1,0 +1,5 @@
+---
+- hosts: [vault]
+  roles:
+  - role: vault
+    vault_action: deploy
