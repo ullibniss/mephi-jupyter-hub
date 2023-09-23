@@ -1,4 +1,4 @@
-user_passwds = [{% for pass in user_passwds pass + ","}]
+user_pass = [{% for pass in vm_passwords %} {{ pass }}, {% endfor %}]
 
 Vagrant.configure("2") do |master|
     master.vm.box = "ubuntu/jammy64"
@@ -11,8 +11,8 @@ Vagrant.configure("2") do |master|
     master.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1", auto_correct: true
     master.vm.network "forwarded_port", guest: 443, host: 8443, host_ip: "127.0.0.1", auto_correct: true
     master.vm.network "jupyternet", ip: "{{ vagrant_network }}.11", hostname: true
-    master.ssh.username = "{{ defualt_user }}"
-    master.ssh.password = user_pass[1]
+    master.ssh.username = "{{ default_user }}"
+    master.ssh.password = user_pass[0]
     master.vm.provision "shell", inline: <<-SHELL
         apt update
         apt upgrade
@@ -22,7 +22,7 @@ Vagrant.configure("2") do |master|
         SHELL
 end
 
-for i in 2..5 do
+for i in 1..4 do
     config.vm.define "node-#{i}" do |slave|
         slave.vm.box = "ubuntu/jammy64"
         slave.vm.provision "shell",
@@ -32,7 +32,7 @@ for i in 2..5 do
             vb.customize ["modifyvm", :id, "--ioapic", "on"]
         end
         slave.vm.network "jupyternet", ip: "{{ vagrant_network }}.1#{i}", hostname: true
-        slave.ssh.username = "{{ defualt_user }}"
+        slave.ssh.username = "{{ default_user }}"
         slave.ssh.password = user_pass[i]
         slave.vm.provision "shell", inline: <<-SHELL
             apt update

@@ -1,0 +1,2 @@
+---
+- include_tasks: "{{ vagrant_action }}.yml"

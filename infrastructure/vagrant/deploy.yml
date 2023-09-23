@@ -7,7 +7,7 @@
     vars:
       vault_action: get_secret
       vault_secret_path: "vm_creds/vm_{{ vm_num }}"
-      vault_token: ""
+      vault_token: "hvs.pzl1eBxuOx6scnma7w0Ub1mg"
     register: "is_vm_exists"
     loop: "{{ query('sequence', 'start=0 end=4') }}"
     loop_control:
@@ -29,9 +29,15 @@
     vars:
       vault_action: add_secret
       vault_secret_path: "vm_creds/vm_{{ vm_num }}"
-      vault_token: ""
+      vault_token: "hvs.pzl1eBxuOx6scnma7w0Ub1mg"
       vault_secret: "{'ip': '{{ vagrant_network }}.1{{ vm_num }}', 'user':'{{ default_user }}', 'pass':'{{ vm_passwords[vm_num | int] }}'}"
     loop: "{{ query('sequence', 'start=0 end=4') }}"
     loop_control:
       loop_var: vm_num
     when: get_secret_fail is defined and get_secret_fail == true
+
+  - name: Deploy Vagrant
+    include_role:
+      name: vagrant
+    vars: 
+      vagrant_action: deploy
