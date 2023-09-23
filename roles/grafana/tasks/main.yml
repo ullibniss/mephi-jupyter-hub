@@ -1,0 +1,2 @@
+---
+- include_tasks: "{{ grafana_action }}.yml"

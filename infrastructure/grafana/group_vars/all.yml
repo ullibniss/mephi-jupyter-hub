@@ -1,0 +1,2 @@
+deploy_dir: "/home/{{ default_user }}/deployment"
+default_user: "{{ lookup('env', 'USER') }}"

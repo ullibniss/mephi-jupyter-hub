@@ -1,0 +1,21 @@
+---
+- name: Create directories for grafana deployment
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  loop:
+  - "{{ grafana_deploy_dir }}"
+  - "{{ grafana_logs_dir }}"
+  - "{{ grafana_data_dir }}"
+  become: true
+
+- name: Deploy grafana
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    docker_compose_template: docker-compose.yml
+    docker_compose_action: deploy
+    docker_compose_service_deploy_dir: "{{ grafana_deploy_dir }}"

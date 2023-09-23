@@ -1,0 +1,6 @@
+- name: Stop grafana
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    - docker_compose_action: stop
+    - docker_compose_service_deploy_dir: "{{ grafana_deploy_dir }}"
