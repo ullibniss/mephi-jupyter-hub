@@ -4,6 +4,8 @@
 
 ## Stack
 
+- jupyterHub
+- docker
 - docker-compose
 - docker-swarm
 - vault
