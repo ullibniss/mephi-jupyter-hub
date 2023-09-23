@@ -1,0 +1,7 @@
+---
+- name: Status nginx
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    - docker_compose_action: status
+    - docker_compose_service_deploy_dir: "{{ nginx_deploy_dir }}"

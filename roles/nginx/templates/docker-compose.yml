@@ -1,0 +1,15 @@
+version: "3.1"
+services:
+  nginx:
+    container_name: nginx
+    restart: always
+    image: "nginx:1.21.6-alpine"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ nginx_deploy_dir }}/logs:/var/log/nginx:rw"
+      - "{{ nginx_deploy_dir }}/certs:/etc/nginx_certs:ro"
+      - "{{ nginx_deploy_dir }}/conf:/etc/nginx/:ro"
+    networks:
+      - default

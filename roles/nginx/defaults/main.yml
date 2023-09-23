@@ -1,0 +1,3 @@
+nginx_deploy_dir: "{{ deploy_dir }}/nginx"
+nginx_logs_dir: "{{ nginx_deploy_dir }}/logs"
+nginx_conf_dir: "{{ nginx_deploy_dir }}/conf"

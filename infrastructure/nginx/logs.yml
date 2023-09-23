@@ -1,0 +1,5 @@
+---
+- hosts: [nginx]
+  roles:
+  - role: nginx
+    nginx_action: logs

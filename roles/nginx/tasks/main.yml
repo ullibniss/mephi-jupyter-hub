@@ -1,0 +1,2 @@
+---
+- include_tasks: "{{ nginx_action }}.yml"
