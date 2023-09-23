@@ -1,0 +1,5 @@
+---
+- name: Up vagrant box
+  command: vagrant up --provider=virtualbox
+  args:
+    chdir: "{{ vagrant_deploy_dir }}"

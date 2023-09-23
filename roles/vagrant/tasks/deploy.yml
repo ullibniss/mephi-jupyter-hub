@@ -1,0 +1,18 @@
+---
+- name: Create vagrant dir
+  file:
+    path: "{{ vagrant_deploy_dir }}"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  become: true
+
+- name: Render vagrant file
+  template:
+    src: Vagrantfile
+    dest: "{{ vagrant_deploy_dir }}/Vagrantfile"
+    onwer: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  become: true

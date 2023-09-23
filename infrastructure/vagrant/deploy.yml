@@ -1,0 +1,37 @@
+---
+- hosts: [vagrant]
+  tasks:  
+  - name: Check if vms creds exists
+    include_role:
+      name: vault
+    vars:
+      vault_action: get_secret
+      vault_secret_path: "vm_creds/vm_{{ vm_num }}"
+      vault_token: ""
+    register: "is_vm_exists"
+    loop: "{{ query('sequence', 'start=0 end=4') }}"
+    loop_control:
+      loop_var: vm_num
+
+  - name: Create passwords if check failed
+    set_fact:
+      vm_passwords:
+        - "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
+        - "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
+        - "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
+        - "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
+        - "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
+    when: get_secret_fail is defined and get_secret_fail == true
+
+  - name: Add mv creds to vault
+    include_role:
+      name: vault
+    vars:
+      vault_action: add_secret
+      vault_secret_path: "vm_creds/vm_{{ vm_num }}"
+      vault_token: ""
+      vault_secret: "{'ip': '{{ vagrant_network }}.1{{ vm_num }}', 'user':'{{ default_user }}', 'pass':'{{ vm_passwords[vm_num | int] }}'}"
+    loop: "{{ query('sequence', 'start=0 end=4') }}"
+    loop_control:
+      loop_var: vm_num
+    when: get_secret_fail is defined and get_secret_fail == true

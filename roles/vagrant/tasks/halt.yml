@@ -1,0 +1,5 @@
+---
+- name: Halt vagrant box
+  command: vagrant halt
+  args:
+    chdir: "{{ vagrant_deploy_dir }}"
