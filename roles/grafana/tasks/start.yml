@@ -1,6 +1,7 @@
 - name: Start grafana
   ansible.builtin.import_role:
-    name: docker_compose
+    name: docker_stack
   vars:
-    - docker_compose_action: start
-    - docker_compose_service_deploy_dir: "{{ grafana_deploy_dir }}"
+    - docker_stack_action: deploy
+    - docker_stack_service_deploy_dir: "{{ grafana_deploy_dir }}"
+    - docker_stack_service_name: "grafana"

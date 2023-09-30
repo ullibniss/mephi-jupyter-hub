@@ -1,0 +1,3 @@
+prometheus_deploy_dir: "{{ deploy_dir }}/prometheus"
+prometheus_logs_dir: "{{ prometheus_deploy_dir }}/logs"
+prometheus_data_dir: "{{ prometheus_deploy_dir }}/data"

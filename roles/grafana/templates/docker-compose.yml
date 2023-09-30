@@ -9,6 +9,8 @@ services:
       - '8203:3000'
     volumes:
       - grafana_data:/var/lib/grafana
-      
+      - "{{ grafana_deploy_dir }}/dashboards.yml:/etc/grafana/provisioning/dashboards/dashboards.yml"
+      - "{{ grafana_dashboards_dir }}:/var/lib/grafana/dashboards"
+      - "{{ grafana_datasources_dir }}:/etc/grafana/provisioning/datasources"
 volumes:
-  grafana_data: {}
+  grafana_data:

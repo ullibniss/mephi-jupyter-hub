@@ -1,0 +1,7 @@
+---
+- name: Status prometheus
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    - docker_compose_action: status
+    - docker_compose_service_deploy_dir: "{{ prometheus_deploy_dir }}"

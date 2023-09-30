@@ -1,3 +1,5 @@
 grafana_deploy_dir: "{{ deploy_dir }}/grafana"
 grafana_logs_dir: "{{ grafana_deploy_dir }}/logs"
 grafana_data_dir: "{{ grafana_deploy_dir }}/data"
+grafana_dashboards_dir: "{{ grafana_deploy_dir }}/dashboards"
+grafana_datasources_dir: "{{ grafana_deploy_dir }}/datasources"

@@ -10,6 +10,39 @@
   - "{{ grafana_deploy_dir }}"
   - "{{ grafana_logs_dir }}"
   - "{{ grafana_data_dir }}"
+  - "{{ grafana_dashboards_dir }}"
+  - "{{ grafana_datasources_dir }}"
+  become: true
+
+- name: Copy dashboards
+  copy:
+    src: "{{ item }}"
+    dest: "{{ grafana_dashboards_dir }}"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
+  with_fileglob:
+    - "templates/dashboards/*"
+  become: true
+
+- name: Copy datasources
+  copy:
+    src: "{{ item }}"
+    dest: "{{ grafana_datasources_dir }}"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
+  with_fileglob:
+    - "templates/datasources/*"
+  become: true
+
+- name: Copy dashboards config
+  template:
+    src: dashboards.yml
+    dest: "{{ grafana_deploy_dir }}"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
   become: true
 
 - name: Deploy grafana

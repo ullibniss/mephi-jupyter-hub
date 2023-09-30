@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  prometheus:
+   image: "prom/prometheus"
+   volumes:
+   - "prometheus_data:/etc/prometheus"
+   - "{{ prometheus_deploy_dir }}/prometheus.yml:/etc/prometheus/prometheus.yml"
+   ports:
+   - "9090:9090"
+
+
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+    ports:
+    - "9100:9100"
+    deploy:
+        replicas: 2
+        placement:
+          max_replicas_per_node: 1
+
+   
+volumes:
+  prometheus_data:

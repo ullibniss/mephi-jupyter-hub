@@ -1,0 +1,30 @@
+---
+- name: Create prometheus dirs
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  loop:
+  - "{{ prometheus_deploy_dir }}"
+  - "{{ prometheus_logs_dir }}"
+  - "{{ prometheus_data_dir}}"
+  become: true
+
+- name: Render prometheus yml
+  template:
+    src: prometheus.yml
+    dest: "{{ prometheus_deploy_dir }}/prometheus.yml"
+    group: 65534
+    owner: 65534
+    mode: 0644
+  become: true
+
+- name: Deploy prometheus
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    docker_compose_template: docker-compose.yml
+    docker_compose_action: deploy
+    docker_compose_service_deploy_dir: "{{ prometheus_deploy_dir }}"
