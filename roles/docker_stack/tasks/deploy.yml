@@ -1,0 +1,5 @@
+---
+- name: Stack deploy
+  command: "docker stack deploy --compose-file docker-compose.yml {{ docker_stack_service_name }}"
+  args:
+    chdir: "{{ docker_stack_service_deploy_dir }}"
