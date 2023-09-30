@@ -1,0 +1,53 @@
+---
+- name: Fetch vault root token locally
+  block:
+    - name: Get vault root token
+      ansible.builtin.set_fact:
+        vault_root_token: "{{ lookup('file', '{{ vault_deploy_dir }}/.root_token_file') }}"
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['vault'] }}"
+      become: true
+  rescue:
+    - name: Generate vault root token
+      ansible.builtin.set_fact:
+        vault_root_token: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
+    
+    - name: Add root token in file
+      ansible.builtin.lineinfile:
+        path: "{{ vault_deploy_dir }}/.root_token_file"
+        line: "{{ vault_root_token }}"
+        create: yes
+        owner: "0"
+        group: "0"
+        mode: 0644
+      delegate_to: "{{ item }}"
+      loop: "{{ groups['vault'] }}"
+      become: true
+  when: is_ci is undefined or not is_ci
+
+- name: Fetch vault root token CI
+  block:
+    - name: Get vault root token
+      ansible.builtin.uri:
+        url: https://gitlab.example.com/api/v4/projects/1/variables/VAULT_ROOT_TOKEN
+        method: GET
+        headers:
+          PRIVATE-TOKEN: "{{ gitlab_ci_token }}"
+        register: response
+
+    - name: Get root token from variable
+      ansible.builtin.set_fact:
+        vault_root_token: "{{ response.json.data.value }}"
+  rescue:
+    - name: Generate vault root token
+      ansible.builtin.set_fact:
+        vault_root_token: "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
+
+    - name: Set vault root token
+      ansible.builtin.uri:
+        url: "https://gitlab.example.com/api/v4/projects/1/variables"
+        method: POST
+        headers:
+          PRIVATE-TOKEN: "{{ gitlab_ci_token }}"
+        body: "{'key':'VAULT_ROOT_TOKEN', 'value': '{{ vault_root_token }}'} }"
+  when: is_ci is defined and is_ci == true

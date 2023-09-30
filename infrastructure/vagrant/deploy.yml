@@ -7,7 +7,6 @@
     vars:
       vault_action: get_secret
       vault_secret_path: "vm_creds/vm_{{ vm_num }}"
-      vault_token: "hvs.pzl1eBxuOx6scnma7w0Ub1mg"
     register: "is_vm_exists"
     loop: "{{ query('sequence', 'start=0 end=4') }}"
     loop_control:
@@ -23,18 +22,42 @@
         - "{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits'] )}}"
     when: get_secret_fail is defined and get_secret_fail == true
 
+  - name: Get bridge network
+    shell: "ip route | awk '/^default/ {printf \"%s\", $3; exit 0}'"
+    register: ip_route_stdout
+
+  - name: Make network variable
+    set_fact:
+      vagrant_network: "{{ ip_route_stdout.stdout}}"
+
   - name: Add mv creds to vault
     include_role:
       name: vault
     vars:
       vault_action: add_secret
       vault_secret_path: "vm_creds/vm_{{ vm_num }}"
-      vault_token: "hvs.pzl1eBxuOx6scnma7w0Ub1mg"
-      vault_secret: "{'ip': '{{ vagrant_network }}.1{{ vm_num }}', 'user':'{{ default_user }}', 'pass':'{{ vm_passwords[vm_num | int] }}'}"
+      vault_secret: "{'ip': '{{ vagrant_network }}1{{ vm_num }}', 'user':'{{ default_user }}', 'pass':'{{ vm_passwords[vm_num | int] }}'}"
     loop: "{{ query('sequence', 'start=0 end=4') }}"
     loop_control:
       loop_var: vm_num
     when: get_secret_fail is defined and get_secret_fail == true
+
+  - name: Fetch token
+    import_role:
+      name: vault
+    vars:
+      vault_action: fetch_token
+    when: get_secret_fail is undefined
+
+  - name: Load passwords
+    set_fact:
+      vm_passwords:
+        - "{{ lookup('hashi_vault', 'secret=secrets/data/vm_creds/vm_0:pass token={{ vault_root_token }} url=http://{{ vault_host }}:{{ vault_port }}' )}}"
+        - "{{ lookup('hashi_vault', 'secret=secrets/data/vm_creds/vm_1:pass token={{ vault_root_token }} url=http://{{ vault_host }}:{{ vault_port }}' )}}"
+        - "{{ lookup('hashi_vault', 'secret=secrets/data/vm_creds/vm_2:pass token={{ vault_root_token }} url=http://{{ vault_host }}:{{ vault_port }}' )}}"
+        - "{{ lookup('hashi_vault', 'secret=secrets/data/vm_creds/vm_3:pass token={{ vault_root_token }} url=http://{{ vault_host }}:{{ vault_port }}' )}}"
+        - "{{ lookup('hashi_vault', 'secret=secrets/data/vm_creds/vm_4:pass token={{ vault_root_token }} url=http://{{ vault_host }}:{{ vault_port }}' )}}"
+    when: get_secret_fail is undefined
 
   - name: Deploy Vagrant
     include_role:
