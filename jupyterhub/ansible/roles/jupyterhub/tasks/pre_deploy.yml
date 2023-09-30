@@ -1,6 +1,0 @@
----
-- name: install nvidia container runtime
-  ansible.builtin.import_role:
-    name: nvidia
-  vars:
-    nvidia_action: install

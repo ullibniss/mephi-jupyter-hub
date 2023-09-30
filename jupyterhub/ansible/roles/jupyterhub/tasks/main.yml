@@ -1,2 +1,0 @@
----
-- include_tasks: "{{ jupyterhub_action }}.yml"
