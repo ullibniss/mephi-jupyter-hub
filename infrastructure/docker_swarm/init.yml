@@ -1,0 +1,6 @@
+---
+- hosts: [swarm]
+  roles:
+  - role: docker_swarm
+    docker_swarm_action: init
+    master_network: 192.168.31.110

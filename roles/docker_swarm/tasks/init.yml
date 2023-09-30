@@ -1,0 +1,27 @@
+
+- name: Init master
+  block:
+  - name: Init master node
+    command: docker swarm init --advertise-addr "{{ master_network }}"
+    register: docker_swarm_init
+    delegate_to: "{{ item }}"
+    loop: "{{ groups['swarm_master'] }}"
+  rescue:
+    - name: Set flag
+      set_fact:
+        master_initialized: true
+    - name: Swarm initialized
+      debug:
+        msg: "Swarm initialized"
+
+
+- name: Get join command
+  shell: "echo '{{ docker_swarm_init.results[0].stdout }}' | head -5 | tail -n 1"
+  register: join_command
+  when: master_initialized is undefined or master_initialized == false
+  
+- name: Swarm nodes join
+  command: "{{ join_command.stdout }}"
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['swarm_nodes'] }}"
+  when: master_initialized is undefined or master_initialized == false
