@@ -1,0 +1,7 @@
+---
+- name: Logs jupyterhub
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    - docker_compose_action: logs
+    - docker_compose_service_deploy_dir: "{{ jupyterhub_deploy_dir }}"

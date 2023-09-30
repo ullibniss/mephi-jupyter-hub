@@ -1,0 +1,7 @@
+- name: Start jupyterhub
+  ansible.builtin.import_role:
+    name: docker_stack
+  vars:
+    - docker_stack_action: deploy
+    - docker_stack_service_deploy_dir: "{{ jupyterhub_deploy_dir }}"
+    - docker_stack_service_name: "jupyterhub"
