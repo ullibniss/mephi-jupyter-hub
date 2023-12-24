@@ -1,0 +1,6 @@
+- name: Start dns
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    - docker_compose_action: start
+    - docker_compose_service_deploy_dir: "{{ dns_deploy_dir }}"

@@ -1,0 +1,13 @@
+version: "3.5"
+
+services:
+  dns:
+    image: adguard/adguardhome:latest
+    ports:
+    - "54:53"
+    - "8887:80"
+    restart: unless-stopped
+    volumes:
+    - {{ dns_work_dir }}:/opt/adguardhome/work
+    - {{ dns_conf_dir }}:/opt/adguardhome/conf
+    hostname: dns

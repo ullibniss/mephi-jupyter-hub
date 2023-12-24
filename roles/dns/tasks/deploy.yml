@@ -1,0 +1,30 @@
+---
+- name: Deploy dns directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    group: "{{ default_user }}"
+    owner: "{{ default_user }}"
+    mode: 0755
+  loop:
+    - "{{ dns_deploy_dir }}"
+    - "{{ dns_work_dir }}"
+    - "{{ dns_conf_dir }}"
+  become: true
+
+- name: Render config file
+  copy:
+    src: templates/AdGuardHome.yaml
+    dest: "{{ dns_conf_dir }}/AdGuardHome.yaml"
+    group: "{{ default_user }}"
+    owner: "{{ default_user }}"
+    mode: 0644
+  become: true
+
+- name: Deploy dns
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    docker_compose_template: docker-compose.yml
+    docker_compose_action: deploy
+    docker_compose_service_deploy_dir: "{{ dns_deploy_dir }}"
