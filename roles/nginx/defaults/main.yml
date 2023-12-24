@@ -1,3 +1,17 @@
 nginx_deploy_dir: "{{ deploy_dir }}/nginx"
 nginx_logs_dir: "{{ nginx_deploy_dir }}/logs"
 nginx_conf_dir: "{{ nginx_deploy_dir }}/conf"
+
+nginx_domains:
+  - domain: prometheus.local
+    directory: "{{ nginx_conf_dir }}/prometheus.local"
+    location: 192.168.31.110:9090
+  - domain: grafana.local
+    directory: "{{ nginx_conf_dir }}/grafana.local"
+    location: 192.168.31.110:8203
+  - domain: jupyter.local
+    directory: "{{ nginx_conf_dir }}/jupyter.local"
+    location: 192.168.31.110:8000
+  - domain: registry.local
+    directory: "{{ nginx_conf_dir }}/registry.local"
+    location: 192.168.31.110:5000

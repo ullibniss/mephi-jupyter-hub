@@ -10,6 +10,112 @@
   - "{{ nginx_deploy_dir }}"
   - "{{ nginx_logs_dir }}"
   - "{{ nginx_conf_dir }}"
+  - "{{ nginx_conf_dir }}/sites-enabled"
+  become: true
+
+- name: Create nginx directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  loop:
+  - "{{ nginx_deploy_dir }}"
+  - "{{ nginx_logs_dir }}"
+  - "{{ nginx_conf_dir }}"
+  become: true
+  delegate_to: 127.0.0.1
+
+- name: Create certs dir
+  file:
+    path: "{{ item.directory }}"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  loop: "{{ nginx_domains }}"
+  become: true
+  delegate_to: 127.0.0.1
+
+- name: Create certs dir
+  file:
+    path: "{{ item.directory }}"
+    state: directory
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0755
+  loop: "{{ nginx_domains }}"
+  become: true
+
+- name: Install mkcert
+  apt:
+    pkg: 
+    - mkcert
+    - libnss3-tools
+    update-cache: true
+  become: true
+
+- name: Make certs
+  shell: mkcert -cert-file cert.pem -key-file key.pem {{ item.domain }}
+  args:
+    chdir: "{{ item.directory }}"
+  loop: "{{ nginx_domains }}"
+  become: true
+  delegate_to: 127.0.0.1
+
+- name: Set permission for key
+  shell: chmod 644 {{ item.directory }}/key.pem
+  loop: "{{ nginx_domains }}"
+  become: true
+  delegate_to: 127.0.0.1
+
+- name: Install certs
+  shell: mkcert -install
+  become: true
+  delegate_to: 127.0.0.1
+
+- name: Copy certs to remote host
+  copy:
+    src: "{{ item.directory }}/cert.pem"
+    dest: "{{ item.directory }}/cert.pem"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
+  loop: "{{ nginx_domains }}"
+  become: true
+
+- name: Copy keys to remote host
+  copy:
+    src: "{{ item.directory }}/key.pem"
+    dest: "{{ item.directory }}/key.pem"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
+  loop: "{{ nginx_domains }}"
+  become: true
+
+- name: Render nginx conf files
+  template:
+    src: "conf/{{ item }}"
+    dest: "{{ nginx_conf_dir }}/{{ item }}"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
+  loop:
+    - mime.types
+    - nginx.conf
+    - proxy.conf
+  become: true
+
+- name: "Render nginx conf files"
+  template:
+    src: conf/enabled/site.local.conf
+    dest: "{{ nginx_conf_dir }}/sites-enabled/{{ item.domain }}.conf"
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
+  loop: "{{ nginx_domains }}"
   become: true
 
 - name: Deploy nginx
