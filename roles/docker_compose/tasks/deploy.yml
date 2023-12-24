@@ -8,3 +8,4 @@
   command: docker-compose pull
   args:
     chdir: "{{ docker_compose_service_deploy_dir }}"
+  when: no_pull is undefined or no_pull == false

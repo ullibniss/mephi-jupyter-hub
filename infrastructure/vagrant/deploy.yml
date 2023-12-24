@@ -28,7 +28,7 @@
 
   - name: Make network variable
     set_fact:
-      vagrant_network: "{{ ip_route_stdout.stdout}}"
+      vagrant_network: "192.168.56.1"
 
   - name: Add mv creds to vault
     include_role:

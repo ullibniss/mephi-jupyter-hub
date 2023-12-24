@@ -27,6 +27,9 @@
     group: "{{ default_user }}"
   when: vault_unsealer == true
 
+- name: Create root token
+  include_tasks: fetch_token.yml
+
 - name: Deploy vault
   ansible.builtin.import_role:
     name: docker_compose

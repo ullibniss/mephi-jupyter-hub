@@ -1,0 +1,19 @@
+---
+- name: Deploy registry directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    group: "{{ default_user }}"
+    owner: "{{ default_user }}"
+    mode: 0755
+  loop:
+    - "{{ registry_deploy_dir }}"
+  become: true
+
+- name: Deploy registry
+  ansible.builtin.import_role:
+    name: docker_compose
+  vars:
+    docker_compose_template: docker-compose.yml
+    docker_compose_action: deploy
+    docker_compose_service_deploy_dir: "{{ registry_deploy_dir }}"

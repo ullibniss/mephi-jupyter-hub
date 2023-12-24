@@ -1,0 +1,7 @@
+- hosts: [vagrant]
+  tasks:  
+  - name: Install Vagrant
+    include_role:
+      name: vagrant
+    vars: 
+      vagrant_action: install

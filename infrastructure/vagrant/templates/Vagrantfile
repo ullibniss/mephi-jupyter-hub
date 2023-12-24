@@ -9,11 +9,19 @@ Vagrant.configure("2") do |config|
             vb.customize ["modifyvm", :id, "--cpus", "2"]
             vb.customize ["modifyvm", :id, "--ioapic", "on"]
         end
-        master.vm.network "public_network", ip: "{{ vagrant_network }}10", name: "jupyternet",  bridge: "#$default_network_interface"
+        master.vm.network "public_network", ip: "192.168.31.110", bridge: "#$default_network_interface"
+        master.vm.network "private_network", ip: "{{ vagrant_network }}10"
         master.vm.provision "shell", args: "{{ default_user }} #{ user_pass[0]}", inline: <<-SHELL
             apt update
-            apt upgrade
-            apt install -y docker.io docker-compose
+            apt install ca-certificates curl gnupg
+            install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            chmod a+r /etc/apt/keyrings/docker.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            tee /etc/apt/sources.list.d/docker.list > /dev/null
+            apt update
+            apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
             apt install wget curl htop
             sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
             sed -i 's/UsePAM yes/UsePAM no/' /etc/ssh/sshd_config
@@ -21,6 +29,7 @@ Vagrant.configure("2") do |config|
             swapoff -a
             useradd -s /bin/bash -m -G docker $1
             echo "$2\n$2" | passwd $1
+            echo "{{ default_user }} ALL=(ALL:ALL) ALL" >> /etc/sudoers
             SHELL
     end
     config.vm.define "node-1" do |slave|
@@ -30,10 +39,19 @@ Vagrant.configure("2") do |config|
             vb.customize ["modifyvm", :id, "--cpus", "1"]
             vb.customize ["modifyvm", :id, "--ioapic", "on"]
         end
-        slave.vm.network "public_network", ip: "{{ vagrant_network }}11", name: "jupyternet", bridge: "#$default_network_interface"
+        slave.vm.network "private_network",ip: "{{ vagrant_network }}11"
         slave.vm.provision "shell", args: "{{ default_user }} #{ user_pass[1]}", inline: <<-SHELL
             apt update
             apt upgrade
+            apt install ca-certificates curl gnupg
+            install -m 0755 -d /etc/apt/keyrings
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+            chmod a+r /etc/apt/keyrings/docker.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            tee /etc/apt/sources.list.d/docker.list > /dev/null
+            apt update
+            apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
             apt install -y docker.io docker-compose
             apt install wget curl htop
             sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
@@ -42,6 +60,7 @@ Vagrant.configure("2") do |config|
             swapoff -a
             useradd -s /bin/bash -m -G docker,sudo $1
             echo "$2\n$2" | passwd $1
+            echo "{{ default_user }} ALL=(ALL:ALL) ALL" >> /etc/sudoers
             SHELL
     end
 end

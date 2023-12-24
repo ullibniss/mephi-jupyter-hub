@@ -1,0 +1,2 @@
+---
+- include_tasks: "{{ registry_action }}.yml"
