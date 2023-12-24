@@ -1,0 +1,5 @@
+---
+- name: Build jupyterhub
+  shell: docker build -t jupyterhub/jupyterhub:self . 
+  args:
+    chdir: "{{ jupyterhub_build_dir }}"

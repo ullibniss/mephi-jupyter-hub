@@ -1,0 +1,5 @@
+---
+- hosts: [jupyterhub]
+  roles:
+  - role: jupyterhub
+    jupyterhub_action: build

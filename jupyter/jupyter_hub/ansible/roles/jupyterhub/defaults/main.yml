@@ -1,1 +1,2 @@
 jupyterhub_deploy_dir: "{{ deploy_dir }}/jupyterhub"
+jupyterhub_build_dir: "{{ deploy_dir }}/jupyterhub/build"
