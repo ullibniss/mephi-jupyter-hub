@@ -14,6 +14,9 @@
 - prometheus
 - ansible
 - nginx
-
+- AdguardHome dns
+- mkcert
+  
 ## Usage
 
+TODO
