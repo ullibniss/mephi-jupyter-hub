@@ -11,4 +11,4 @@ c.SwarmSpawner.image = 'quay.io/jupyter/tensorflow-notebook'
 c.SwarmSpawner.network_name = "jupyterhub_jupyternet"
 c.SwarmSpawner.extra_host_config = {'network_mode': c.SwarmSpawner.network_name}
 c.SwarmSpawner.start_timeout = 300
-c.SwarmSpawner.hub_ip_connect = "10.0.4.1"
+c.SwarmSpawner.hub_ip_connect = "10.0.3.1"

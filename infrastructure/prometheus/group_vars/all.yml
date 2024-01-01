@@ -1,2 +1,4 @@
 deploy_dir: "/home/{{ default_user }}/deployment"
 default_user: "{{ lookup('env', 'USER') }}"
+
+vault_creds: "url=http://{{ lookup('env', 'VAULT_HOST') }} token={{ lookup('file', '{{ deploy_dir }}/vault/.root_token_file')}}"
