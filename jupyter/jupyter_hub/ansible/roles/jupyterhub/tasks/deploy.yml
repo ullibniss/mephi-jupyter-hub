@@ -20,6 +20,48 @@
     mode: 0644
   become: true
 
+- name: Fetch token
+  import_role:
+    name: vault
+  vars:
+    vault_action: fetch_token
+  when: get_secret_fail is undefined
+  
+- name: Check if vms creds exists
+  include_role:
+    name: vault
+  vars:
+    vault_action: get_secret
+    vault_secret_path: "userlist/{{ item }}"
+  register: "is_vm_exists"
+  loop: "{{ jupyterhub_userlist }}"
+
+- name: Generate userlist passwords
+  include_role:
+    name: vault
+  vars:
+    vault_action: add_secret
+    vault_secret_path: "userlist/{{ item }}"
+    vault_secret: "{'user': {{ item }}, 'pass':{{ lookup('ansible.builtin.password', '/dev/null', length=24, chars=['ascii_lowercase', 'digits']) }}}"
+  loop: "{{ jupyterhub_userlist }}"
+  when: get_secret_fail is defined and get_secret_fail == true
+
+- name: Create userlist file
+  file:
+    path: "{{ jupyterhub_deploy_dir }}/userlist"
+    state: present
+    owner: "{{ default_user }}"
+    group: "{{ default_user }}"
+    mode: 0644
+  become: true
+
+- name: Render userlist file
+  lineinfile:
+    create: yes
+    line: "{{ item }} {{ lookup('hashi_vault', 'secret=secrets/data/userlist/{{ item }}:pass {{ vault_creds }} ') }}"
+    path: "{{ jupyterhub_deploy_dir }}/userlist"
+  loop: "{{ jupyterhub_userlist }}"
+
 - name: Render jupyterhub_config.py
   template:
     src: jupyterhub_config.py

@@ -5,6 +5,7 @@ services:
     image: jupyterhub/jupyterhub:self
     volumes:
       - "{{ jupyterhub_deploy_dir }}/jupyterhub_config.py:/etc/jupyterhub/jupyterhub_config.py"
+      - "{{ jupyterhub_deploy_dir }}/userlist:/etc/jupyterhub/userlist"
       - "/var/run/docker.sock:/var/run/docker.sock"
     ports:
       -  8000:8000
